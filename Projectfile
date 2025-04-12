@@ -1,0 +1,48 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+file_path = r'Electric_Vehicle_Population_Data.xlsx'
+df = pd.read_excel(file_path)
+
+print(df.head())
+print(df.describe())
+print("\nMissing values:")
+print(df.isnull().sum())
+
+df_cleaned = df.dropna().copy()
+df_cleaned['Model Year'] = pd.to_numeric(df_cleaned['Model Year'], errors='coerce')
+yearly_counts = df_cleaned['Model Year'].value_counts().sort_index()
+
+plt.figure(figsize=(10, 6))
+yearly_counts.plot(kind='line', marker='o')
+plt.title('EV Registrations Over Years')
+plt.xlabel('Year')
+plt.ylabel('Number of Registrations')
+plt.grid(True)
+plt.show()
+
+top_makes = df_cleaned['Make'].value_counts().head(10)
+
+plt.figure(figsize=(10, 6))
+top_makes.plot(kind='bar', color='skyblue')
+plt.title('Top 10 EV Manufacturers')
+plt.xlabel('Manufacturer')
+plt.ylabel('Number of Vehicles')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+numerical_cols = ['Model Year', 'Electric Range', 'Base MSRP']
+df_numeric = df_cleaned[numerical_cols].dropna()
+corr_matrix = df_numeric.corr()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(x=df_cleaned['Electric Range'])
+plt.title('Boxplot of Electric Range')
+plt.show()
